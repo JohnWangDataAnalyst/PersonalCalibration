@@ -176,7 +176,7 @@ for filename in csvfilename_lst:
 
         dict_music[file][0] = np.append(dict_music[file][0],data.loc[data['Filename'].isin([file])].ix[:, 'pos_x'].values)
         dict_music[file][1] = np.append(dict_music[file][1],data.loc[data['Filename'].isin([file])].ix[:, 'pos_y'].values)
-        title = file.split('\\')[-1]
+        title = file.split('\\')[-1].split('.')[0]
         dict_music[file][2] = num_music
         dict_music[file][3] = title
 
@@ -186,7 +186,7 @@ for filename in csvfilename_lst:
         dict_mu_te[filename][0][file][1] = data.loc[data['Filename'].isin([file])].ix[:, 'pos_y'].values
         dict_mu_te[filename][0][file][2] = data.loc[data['Filename'].isin([file])].ix[:, 'CurrentTime'].values - data.loc[data['Filename'].isin([file])].ix[:, 'StartTime'].values
         dict_mu_te[filename][0][file][3] = num_music
-        dict_mu_te[filename][0][file][4] = file.split('\\')[-1]
+        dict_mu_te[filename][0][file][4] = file.split('\\')[-1].split('.')[0]
         dict_mu_te[filename][0][file][5] = 1.0 - num_music / len(filenameList)
 
 
@@ -212,7 +212,7 @@ for filename in csvfilename_lst:
         dict_music_prac[file][1] = np.append(dict_music_prac[file][1],data.loc[data['Filename'].isin([file])].ix[:, 'pos_y'].values)
 
 
-        title = file.split('\\')[-1]
+        title = file.split('\\')[-1].split('.')[0]
 
         dict_music_prac[file][2] = num_music_prac
         dict_music_prac[file][3] = title
@@ -221,7 +221,7 @@ for filename in csvfilename_lst:
         dict_mu_te_prac[filename][0][file][1] = data.loc[data['Filename'].isin([file])].ix[:, 'pos_y'].values
         dict_mu_te_prac[filename][0][file][2] = data.loc[data['Filename'].isin([file])].ix[:, 'CurrentTime'].values - data.loc[data['Filename'].isin([file])].ix[:, 'StartTime'].values
         dict_mu_te_prac[filename][0][file][3] = num_music_prac
-        dict_mu_te_prac[filename][0][file][4] = file.split('\\')[-1]
+        dict_mu_te_prac[filename][0][file][4] = file.split('\\')[-1].split('.')[0]
         dict_mu_te_prac[filename][0][file][5] = 1.0 - num_music_prac / len(filenameList_prac)
 
         num_music_prac += 1
@@ -240,22 +240,24 @@ for filename in csvfilename_lst:
 #######################################################################################
 
 
-print(list_all[0].shape)
-print(max(list_all[0]))
-print(min(list_all[0]))
-print(list_all[1].shape)
-print(max(list_all[1]))
-print(min(list_all[1]))
+#print(list_all[0].shape)
+#print(max(list_all[0]))
+#print(min(list_all[0]))
+#print(list_all[1].shape)
+#print(max(list_all[1]))
+#print(min(list_all[1]))
 
-## draw heat map for each music and tester
-
+## heat map by music and tester
 """
+# Practice 6 (testers) figures with 6 (music) subplots
 for filename in csvfilename_lst:
     f, axarr = plt.subplots(2, 3,  sharex = True, sharey = True)
+
     for file in filenameList_prac:
         ax = axarr[divmod(dict_mu_te_prac[filename][0][file][3], 3)[0], divmod(dict_mu_te_prac[filename][0][file][3],3)[1]]
-        sns.kdeplot(dict_mu_te_prac[filename][0][file][0], dict_mu_te_prac[filename][0][file][1], shade = True, n_levels = 50, shade_lowest = False, cmap="Reds", ax = ax)
-        ax.set_title(dict_mu_te_prac[filename][0][file][4])
+        sns.kdeplot(dict_mu_te_prac[filename][0][file][0], dict_mu_te_prac[filename][0][file][1], shade = True, n_levels = 50, shade_lowest = False, cmap="OrRd", ax = ax)
+        ax.set_title(dict_mu_te_prac[filename][0][file][4], fontsize = 10)
+        ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 8)
         ax.set_xlim(-400, 400)
         ax.set_ylim(-350, 350)
 
@@ -269,8 +271,10 @@ for filename in csvfilename_lst:
     f1, axarr = plt.subplots(6, 5,  sharex = True, sharey = True)
     for file in filenameList:
         ax = axarr[divmod(dict_mu_te[filename][0][file][3], 5)[0], divmod(dict_mu_te[filename][0][file][3], 5)[1]]
-        sns.kdeplot(dict_mu_te[filename][0][file][0], dict_mu_te[filename][0][file][1], cmap="Reds", ax = ax)
-        ax.set_title(dict_mu_te[filename][0][file][4])
+        sns.kdeplot(dict_mu_te[filename][0][file][0], dict_mu_te[filename][0][file][1], cmap="OrRd", ax = ax)
+        ax.set_title(dict_mu_te[filename][0][file][4], fontsize = 8)
+        ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 6)
+        ax.set_yticklabels([-300, -200, -100, 0, 100, 200, 300], fontsize = 8)
         ax.set_xlim(-400, 400)
         ax.set_ylim(-350, 350)
 
@@ -278,19 +282,21 @@ for filename in csvfilename_lst:
     plt.show()
     f1.savefig(filename.split('.')[0]+'heatmapByMusic.pdf')
     plt.close(f1)
-"""
-# plot subtotal heatmap  per person
+
+## heatmap cross musics by person
 
 f_pt, axarr = plt.subplots(2, 3,  sharex = True, sharey = True)
 for key in csvfilename_lst:
 
     ax = axarr[divmod(dict_tester[key][2], 3)[0],divmod(dict_tester[key][2],3)[1]]
     sns.kdeplot(dict_tester[key][0], dict_tester[key][1], shade = True, n_levels = 50, shade_lowest = False, cmap="Reds", ax = ax)
-    ax.set_title(dict_tester[key][3])
+    ax.set_title(dict_tester[key][3], fontsize = 10)
+    ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 8)
+    #ax.set_yticklabels([-300, -200, -100, 0, 100, 200, 300], fontsize = 8)
     ax.set_xlim(-400, 400)
     ax.set_ylim(-350, 350)
 
-plt.suptitle('heatmap By Tester')
+plt.suptitle('Heatmap By Tester')
 plt.show()
 f_pt.savefig('heatmapbytester.pdf')
 plt.close(f_pt)
@@ -301,7 +307,9 @@ for key in csvfilename_lst:
 
     ax = axarr[divmod(dict_tester_prac[key][2], 3)[0],divmod(dict_tester_prac[key][2],3)[1]]
     sns.kdeplot(dict_tester_prac[key][0], dict_tester_prac[key][1], shade = True, n_levels = 50, shade_lowest = False, cmap="Reds", ax = ax)
-    ax.set_title(dict_tester_prac[key][3])
+    ax.set_title(dict_tester_prac[key][3], fontsize = 10)
+    ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 8)
+    #ax.set_yticklabels([-300, -200, -100, 0, 100, 200, 300], fontsize = 8)
     ax.set_xlim(-400, 400)
     ax.set_ylim(-350, 350)
 
@@ -313,17 +321,20 @@ plt.close(f_pt1)
 
 
 
-#plot subtotal heatmap per music
+#plot heatmap cross subjects per music
+
 f_pm, axarr = plt.subplots(2, 3,  sharex = True, sharey = True)
 
 for key in dict_music_prac:
     ax = axarr[divmod(dict_music_prac[key][2], 3)[0],divmod(dict_music_prac[key][2],3)[1]]
-    sns.kdeplot(dict_music_prac[key][0], dict_music_prac[key][1], shade = True, n_levels = 50, shade_lowest = False, cmap="Reds", ax = ax)
-    ax.set_title(dict_music_prac[key][3])
+    sns.kdeplot(dict_music_prac[key][0], dict_music_prac[key][1], shade = True, n_levels = 50, shade_lowest = False, cmap="OrRd", ax = ax)
+    ax.set_title(dict_music_prac[key][3], fontsize = 10)
+    ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 8)
+    #ax.set_yticklabels([-300, -200, -100, 0, 100, 200, 300], fontsize = 8)
     ax.set_xlim(-400, 400)
     ax.set_ylim(-350, 350)
 
-plt.suptitle('subTotal by practice music')
+plt.suptitle('Heatmap by practice music')
 plt.show()
 f_pm.savefig('ByMusic_heatmapPractice.pdf')
 plt.close(f_pm)
@@ -333,20 +344,24 @@ f_pm1, axarr = plt.subplots(6, 5,  sharex = True, sharey = True)
 
 for key in dict_music:
     ax = axarr[divmod(dict_music[key][2], 5)[0],divmod(dict_music[key][2], 5)[1]]
-    sns.kdeplot(dict_music[key][0], dict_music[key][1], shade = True, n_levels = 50, shade_lowest = False, cmap="Reds", ax = ax)
-    ax.set_title(dict_music[key][3])
+    sns.kdeplot(dict_music[key][0], dict_music[key][1], shade = True, n_levels = 50, shade_lowest = False, cmap="OrRd", ax = ax)
+    ax.set_title(dict_music[key][3], fontsize = 10)
+    ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 6)
+    ax.set_yticklabels([-300, -200, -100, 0, 100, 200, 300], fontsize = 8)
     ax.set_xlim(-400, 400)
     ax.set_ylim(-350, 350)
 
-plt.suptitle('subTotal by music')
+plt.suptitle('Heatmap by music')
 plt.show()
 f_pm1.savefig('ByMusic_heatmap.pdf')
 plt.close(f_pm1)
+"""
+
 
 #plot trajectory
 
 
-"""
+
 #for key in dict_mu_te_prac['Test_13621.txt']:
 
 f_tr, axarr = plt.subplots(2, 3,  subplot_kw = {'projection':'3d'})
@@ -363,12 +378,15 @@ for filename in csvfilename_lst:
         ax.set_xlim(-400, 400)
         ax.set_ylim(-350, 350)
         ax.set_zlim(0, 80)
+        ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 8)
+        ax.set_yticklabels([-300, -200, -100, 0, 100, 200, 300], fontsize = 8)
+        ax.set_zticklabels([0, 10, 20, 30, 40, 50, 60, 70, 80], fontsize = 8)
         #plt.hold(True)
 
-plt.suptitle('TrajectoryPractice')
-plt.show()
+plt.suptitle('TrajectoryPractice', fontsize = 10)
+#plt.show()
 f_tr.savefig('TrajectoryPractice.pdf')
-plt.close(f_tr)
+#plt.close(f_tr)
 
 
 
@@ -387,15 +405,18 @@ for filename in csvfilename_lst:
         ax.set_xlim(-400, 400)
         ax.set_ylim(-350, 350)
         ax.set_zlim(0, 80)
+        ax.set_xticklabels([-400, -300, -200, -100, 0, 100, 200, 300, 400], fontsize = 8)
+        ax.set_zticklabels([0, 10, 20, 30, 40, 50, 60, 70, 80], fontsize = 8)
+        #ax.set_zticklabels([80, 70, 60,50,40,30,20,10,0], fontsize = 8)
         #plt.hold(True)
 
 
-plt.suptitle('Trajectory')
+plt.suptitle('Trajectory', fontsize = 10)
 plt.show()
 f_tr1.savefig('Trajectory.pdf')
-plt.close(f_tr1)
+#plt.close(f_tr1)
 
-
+"""
 # plot usage of mouse for all user grand-Total
 f_t = plt.figure()
 ax = plt.axes(xlim=(-400, 400), ylim = (-350, 350))
@@ -403,7 +424,7 @@ ax = plt.axes(xlim=(-400, 400), ylim = (-350, 350))
 sns.kdeplot(list_all[0], list_all[1], cmap = "Reds", shade = True, n_levels = 50, shade_lowest = False, ax=ax)
 #sns.rugplot(list_all[0], ax = ax)
 #sns.rugplot(list_all[1], vertical= True, ax= ax)
-plt.suptitle('mouse movement')
+plt.suptitle('Heatmap by total')
 plt.show()
 
 # f.savefig(csvfilename.split('.')[0]+'.pdf')
